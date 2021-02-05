@@ -10,7 +10,7 @@ const config = require('./config')
 const constants = require('../constants')
 
 describe('edward.tip', function () {
-  this.timeout(config.timeout)
+  this.timeout(60000)
 
   before(async function () {
     await db.migrate.forceFreeMigrationsLock()
@@ -38,8 +38,9 @@ describe('edward.tip', function () {
     expect(rows.length).to.be.equal(1)
 
     const row = rows[0]
+    expect(row.uid).to.be.equal(1)
     expect(row.hash)
-      .to.be.equal('830B3244AB9B8E9C7A356D3FCE1A6B413CF13516C71CF6CAE20E139CA05A30E6')
+      .to.be.equal('63CB732692252D23612716C19B30FCED2AF95EF1F286175D61E23C76726B9D45')
     expect(row.address)
       .to.be.equal('nano_3ptedxrbnqjye1fmmim7kkr6dfbz1xyb43zkj74bhs8zth9fgera4qa45bw6')
     expect(row.amount).to.be.equal('1000000000000000000000000')

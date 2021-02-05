@@ -25,7 +25,7 @@ class Edward {
   }
 
   async _send ({ senderId, type, amount, receiverId, accountInfo, transactionType }) {
-    const senderAccount = await this.accounts.findOrCreate({ userId: receiverId, type })
+    const senderAccount = await this.accounts.findOrCreate({ userId: senderId, type })
     const receiverAccount = await this.accounts.findOrCreate({ userId: receiverId, type })
     const hash = nanocurrency.hashBlock({
       account: senderAccount.custody,
@@ -107,7 +107,22 @@ class Edward {
     })
     const hasFunds = this._hasFunds({ accountInfo, amount })
     if (!hasFunds) return { message: constants.INSUFFICENT_FUNDS }
-    // TODO
+
+    const blocks = []
+    const each = amount.dividedBy(receiverIds.length)
+    for (const receiverId of receiverIds) {
+      const block = await this._send({
+        senderId,
+        type,
+        amount: each,
+        receiverId,
+        accountInfo,
+        transactionType: constants.TRANSACTIONS.RAIN
+      })
+      blocks.push(block)
+    }
+
+    return blocks
   }
 
   async info ({ userId, type }) {
