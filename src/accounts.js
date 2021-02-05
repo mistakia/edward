@@ -37,7 +37,7 @@ class Accounts {
   }
 
   async findOrCreate ({ userId, type }) {
-    const account = this.get({ userId, type })
+    const account = await this.get({ userId, type })
     if (account) return account
     return this.create({ userId, type })
   }
