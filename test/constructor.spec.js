@@ -5,10 +5,10 @@ const expect = require('chai').expect
 const config = require('./config')
 const Edward = require('../src/index')
 
-describe('Constructor', function () {
+describe('constructor', function () {
   this.timeout(config.timeout)
 
-  it('create an instance of edward', () => {
+  it('create an instance', () => {
     const edward = new Edward(config.seed)
 
     expect(edward.wallet.seed).to.equal(config.seed)

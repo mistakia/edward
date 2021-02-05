@@ -8,7 +8,7 @@ const db = require('../db')
 const config = require('./config')
 const constants = require('../constants')
 
-describe('Create account', function () {
+describe('accounts', function () {
   this.timeout(config.timeout)
 
   before(async function () {
