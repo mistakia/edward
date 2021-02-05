@@ -14,12 +14,12 @@ describe('constructor', function () {
     expect(edward.wallet.seed).to.equal(config.seed)
     expect(edward.wallet.accounts).to.be.an('array')
 
-    expect(edward.send).to.be.a('function')
+    expect(edward.tip).to.be.a('function')
     expect(edward.register).to.be.a('function')
-    expect(edward.withdraw).to.be.a('function')
     expect(edward.rain).to.be.a('function')
+    expect(edward.stats).to.be.a('function')
     expect(edward.info).to.be.a('function')
-    expect(edward.leaderboard).to.be.a('function')
+    expect(edward.help).to.be.a('function')
 
     const account = edward.wallet.accounts[0]
     expect(account.accountIndex).to.equal(0)

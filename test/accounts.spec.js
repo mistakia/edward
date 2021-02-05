@@ -57,10 +57,12 @@ describe('accounts', function () {
   /* it('account info', async () => {
    *   const account = 'nano_3x4ui45q1cw8hydmfdn4ec5ijsdqi4ryp14g4ayh71jcdkwmddrq7ca9xzn9'
    *   const edward = new Edward(config.seed)
-   *   const accountInfo = await edward._rpc('account_info', { account })
+   *   const accountInfo = await edward._rpc('account_info', { account, representative: true })
 
    *   expect(accountInfo).to.have.property('balance')
    *   expect(accountInfo).to.have.property('balance_decimal')
+   *   expect(accountInfo).to.have.property('frontier')
+   *   expect(accountInfo.representative).to.equal('nano_3mhrc9czyfzzok7xeoeaknq6w5ok9horo7d4a99m8tbtbyogg8apz491pkzt')
    * })
    */
 

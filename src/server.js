@@ -4,13 +4,17 @@ const bodyParser = require('body-parser')
 const debug = require('debug')
 const GroupMe = require('groupme')
 
+const Edward = require('./index')
 const config = require('../config')
+const constants = require('../constants')
 const pkg = require('../package.json')
+const { parseMessage } = require('./utils')
 
 const API = GroupMe.Stateless
 const app = express()
 
 app.locals.log = debug('server')
+app.locals.edward = new Edward(config.seed)
 if (process.env.NODE_ENV !== 'test') debug.enable('server*')
 
 app.use(bodyParser.json())
@@ -33,13 +37,68 @@ app.post('/groupme', async (req, res) => {
     return
   }
 
-  if (message.text.substring(0, 7) !== '/edward') {
+  const msg = parseMessage(message.text)
+  if (!msg.valid) {
+    if (msg.message === constants.MISSING_KEYWORD) return
+
+    switch (msg.message) {
+      case constants.INVALID_ADDRESS:
+      case constants.MISSING_ADDRESS:
+        // TODO - send DM to user
+        break
+
+      case constants.MISSING_AMOUNT:
+      case constants.INVALID_AMOUNT:
+        // TODO - send message to group
+        break
+    }
+
     return
   }
 
-  // TODO parse command
-  const command = message.text
-  app.local.log(`[groupme][${command}]`)
+  app.locals.log(`[groupme][${msg.command}]`)
+  switch (msg.command) {
+    case 'register': {
+      const res = await app.locals.register({
+        userId: message.user_id,
+        type: constants.GROUPME,
+        address: msg.params.address
+      })
+      console.log(res)
+      // Send DM to user
+      break
+    }
+
+    case 'rain': {
+      const res = await API.Groups.show.Q(config.groupme.ACCESS_TOKEN, message.group_id)
+      console.log(res)
+      // const res = await app.locals.rain({ userId, type: constants.GROUPME, to })
+      // Send DM to all receivers
+      // Send message to group
+      break
+    }
+
+    case 'tip': {
+      // get all mentions
+      const res = await app.locals.tip({
+        senderId: message.user_id,
+        type: constants.GROUPME,
+        receiverIds: []
+      })
+      console.log(res)
+      // Send DM to all receivers
+      break
+    }
+
+    case 'info':
+      break
+
+    case 'stats':
+      break
+
+    case 'help':
+      break
+  }
 })
 
 app.get('/', (req, res) => {
