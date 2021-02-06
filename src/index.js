@@ -92,7 +92,10 @@ class Edward {
     })
 
     const hasFunds = !accountInfo.error && this._hasFunds({ accountInfo, amount: total })
-    if (!hasFunds) return { message: constants.INSUFFICENT_FUNDS }
+    if (!hasFunds) {
+      log(`${senderId} has insufficient funds`)
+      return { message: constants.INSUFFICENT_FUNDS }
+    }
 
     const blocks = []
     for (const receiverId of receiverIds) {
@@ -107,7 +110,7 @@ class Edward {
       blocks.push(block)
     }
 
-    return blocks
+    return { blocks }
   }
 
   async rain ({ senderId, type, receiverIds, amount }) {
@@ -143,7 +146,7 @@ class Edward {
      *   groupId
      * })
      */
-    return blocks
+    return { blocks }
   }
 
   async info ({ userId, type }) {

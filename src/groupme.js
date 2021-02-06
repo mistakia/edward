@@ -26,7 +26,7 @@ incoming.on('connected', () => {
 // If the message contains @BOT, we parrot the message back.
 incoming.on('message', async (msg) => {
   const validTypes = ['line.create', 'direct_message.create']
-  if (!validTypes.includes(msg.data.type)) return
+  if (!msg.data || !validTypes.includes(msg.data.type)) return
 
   if (!msg.data.subject.text) {
     return
