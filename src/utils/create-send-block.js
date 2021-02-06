@@ -2,6 +2,7 @@ const debug = require('debug')
 const nanocurrency = require('nanocurrency')
 
 const log = debug('send-block')
+const computeWork = require('./compute-work')
 
 const createSendBlock = async ({
   balanceRaw,
@@ -19,9 +20,7 @@ const createSendBlock = async ({
     representative: representativeAddress
   })
   log(`generating work against ${frontier} for send block ${hash}`)
-  const work = await nanocurrency.computeWork(frontier, {
-    workThreshold: 'fffffff800000000'
-  })
+  const work = await computeWork(frontier)
 
   return {
     hash,

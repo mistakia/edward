@@ -2,7 +2,14 @@ const { block, wallet, tools } = require('nanocurrency-web')
 const BigNumber = require('bignumber.js')
 const debug = require('debug')
 
-const { rpc, createSendBlock, sendDirectMessage, sendGroupMessage } = require('./utils')
+const {
+  rpc,
+  createSendBlock,
+  sendDirectMessage,
+  sendGroupMessage,
+  sendGroupImage,
+  randomGif
+} = require('./utils')
 const Accounts = require('./accounts')
 const db = require('../db')
 const constants = require('../constants')
@@ -94,7 +101,7 @@ class Edward {
     return accountEntry
   }
 
-  async tip ({ senderId, type, receiverIds, amount, senderName }) {
+  async tip ({ senderId, type, receiverIds, amount, senderName, groupId }) {
     if (!senderId || !type || !amount) return
     if (!receiverIds || !receiverIds.length) return
 
@@ -110,7 +117,12 @@ class Edward {
     const hasFunds = !accountInfo.error && this._hasFunds({ accountInfo, amount: total })
     if (!hasFunds) {
       log(`${senderId} has insufficient funds`)
-      return { message: constants.INSUFFICENT_FUNDS }
+      await sendGroupMessage({
+        groupId,
+        type,
+        messages: ['Insufficient Funds']
+      })
+      return
     }
 
     for (const receiverId of receiverIds) {
@@ -126,7 +138,7 @@ class Edward {
     }
   }
 
-  async rain ({ senderId, type, receiverIds, amount, senderName }) {
+  async rain ({ senderId, type, receiverIds, amount, senderName, groupId }) {
     if (!senderId || !type || !amount) return
     if (!receiverIds || !receiverIds.length) return
 
@@ -136,8 +148,18 @@ class Edward {
       account: account.custody,
       representative: true
     })
-    const hasFunds = this._hasFunds({ accountInfo, amount })
-    if (!hasFunds) return { message: constants.INSUFFICENT_FUNDS }
+    log('sender account info', accountInfo)
+
+    const hasFunds = !accountInfo.error && this._hasFunds({ accountInfo, amount })
+    if (!hasFunds) {
+      log(`${senderId} has insufficient funds`)
+      await sendGroupMessage({
+        groupId,
+        type,
+        messages: ['Insufficent funds']
+      })
+      return
+    }
 
     const each = amount.dividedBy(receiverIds.length)
     for (const receiverId of receiverIds) {
@@ -152,12 +174,11 @@ class Edward {
       })
     }
 
-    // TODO - send make it rain gif
-    /* await sendGroupMessage({
-     *   type,
-     *   groupId
-     * })
-     */
+    await sendGroupImage({
+      type,
+      groupId,
+      image: randomGif()
+    })
   }
 
   async info ({ userId, type }) {
@@ -174,7 +195,7 @@ class Edward {
   async help ({ groupId, userId, type }) {
     if (!groupId && !userId) return
     log(`sending help message to ${groupId || userId}`)
-    const messages = ['Commands start with "/edward".\n- /edward help\n- /edward register [nano_address]\n- /edward tip [amount] @user\n- /edward rain [amount]']
+    const messages = ['Commands start with /edward.\n/edward help\n/edward register [nano_address]\n/edward tip [amount] @user\n/edward rain [amount]']
 
     if (groupId) {
       messages.push('Please ask edward for help via direct messages')

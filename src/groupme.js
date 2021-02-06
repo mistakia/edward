@@ -95,6 +95,7 @@ incoming.on('message', async (msg) => {
       const res = await API.Groups.show.Q(config.groupme.ACCESS_TOKEN, groupId)
       const receiverIds = res.members.map(m => m.user_id)
       await edward.rain({
+        groupId,
         senderId: msg.data.subject.user_id,
         senderName: msg.data.subject.name,
         type: constants.GROUPME,
@@ -105,6 +106,12 @@ incoming.on('message', async (msg) => {
     }
 
     case 'tip': {
+      const groupId = msg.data.subject.group_id
+      if (!groupId) {
+        // TODO - send notification
+        return
+      }
+
       // get all mentions
       const mentions = msg.data.subject.attachments.filter(m => m.type === 'mentions')
       const userIds = mentions.map(m => m.user_ids).flat()
@@ -115,6 +122,7 @@ incoming.on('message', async (msg) => {
       }
 
       await edward.tip({
+        groupId: msg.data.subject.group_id,
         senderId: msg.data.subject.user_id,
         senderName: msg.data.subject.name,
         type: constants.GROUPME,

@@ -11,7 +11,7 @@ const sendGroupMessage = async ({ groupId, type, messages }) => {
   if (!groupId) return
   if (!messages || !messages.length) return
 
-  log(`sending ${messages.length}  messages to ${groupId}`)
+  log(`sending ${messages.length} messages to ${groupId}`)
   for (const message of messages) {
     try {
       await API.Messages.create.Q(config.groupme.ACCESS_TOKEN, groupId, {

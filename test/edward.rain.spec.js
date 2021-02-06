@@ -23,19 +23,23 @@ describe('edward.rain', function () {
     const receiverId1 = '2'
     const receiverId2 = '3'
     const receiverId3 = '4'
-    const blocks = await edward.rain({
-      senderId,
-      type: constants.GROUPME,
-      receiverIds: [
-        receiverId1,
-        receiverId2,
-        receiverId3
-      ],
-      amount: new BigNumber('0.000001')
-    })
+    let error
+    try {
+      await edward.rain({
+        senderId,
+        type: constants.GROUPME,
+        receiverIds: [
+          receiverId1,
+          receiverId2,
+          receiverId3
+        ],
+        amount: new BigNumber('0.000001')
+      })
+    } catch (err) {
+      error = err
+    }
 
-    expect(blocks).to.be.an('array')
-    expect(blocks.length).to.be.equal(3)
+    expect(error).to.be.equal(undefined)
 
     // check database for transaction
     const rows = await db('transactions')

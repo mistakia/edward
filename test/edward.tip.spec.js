@@ -21,15 +21,19 @@ describe('edward.tip', function () {
     const edward = new Edward(config.seed)
     const senderId = '1'
     const receiverId = '2'
-    const blocks = await edward.tip({
-      senderId,
-      type: constants.GROUPME,
-      receiverIds: [receiverId],
-      amount: new BigNumber('0.000001')
-    })
+    let error
+    try {
+      await edward.tip({
+        senderId,
+        type: constants.GROUPME,
+        receiverIds: [receiverId],
+        amount: new BigNumber('0.000001')
+      })
+    } catch (err) {
+      error = err
+    }
 
-    expect(blocks).to.be.an('array')
-    expect(blocks.length).to.be.equal(1)
+    expect(error).to.be.equal(undefined)
 
     // check database for transaction
     const rows = await db('transactions')
