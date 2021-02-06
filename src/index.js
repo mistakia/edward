@@ -81,7 +81,7 @@ class Edward {
     await sendDirectMessage({
       userId,
       type,
-      message: `Successfully registered receive address: ${address}. Your tip account address is ${accountEntry.custody}. Tips will be sent from your tip account address, while tips received will go directly to your registered receive address.`
+      messages: [`Successfully registered receive address: ${address}.`, `Your tip account address is ${accountEntry.custody}.`, 'Tips will be sent from your tip account address, while tips received will go directly to your registered receive address. To send tips send nano to your tip account address.']
     })
 
     return accountEntry

@@ -1,17 +1,29 @@
 const GroupMe = require('groupme')
+const debug = require('debug')
+
 const API = GroupMe.Stateless
+const log = debug('groupme:direct-message')
 
 const config = require('../../config')
 
-const sendDirectMessage = async ({ userId, type, message }) => {
+const sendDirectMessage = async ({ userId, type, messages }) => {
   if (process.env.NODE_ENV !== 'production') return
-  const res = await API.DirectMessages.create.Q(config.groupme.ACCESS_TOKEN, {
-    source_guid: Math.round(Date.now() / 1000),
-    recipient_id: userId,
-    text: message
-  })
-  console.log(res)
-  // TODO
+  if (!messages || !messages.length) return
+
+  log(`sending ${messages.length}  messages to ${userId}`)
+
+  for (const message of messages) {
+    try {
+      await API.DirectMessages.create.Q(config.groupme.ACCESS_TOKEN, {
+        direct_message: {
+          recipient_id: userId,
+          text: message
+        }
+      })
+    } catch (err) {
+      log(err)
+    }
+  }
 }
 
 module.exports = sendDirectMessage
