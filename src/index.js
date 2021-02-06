@@ -2,7 +2,7 @@ const { block, wallet, tools } = require('nanocurrency-web')
 const BigNumber = require('bignumber.js')
 const debug = require('debug')
 
-const { rpc, createSendBlock, sendDirectMessage } = require('./utils')
+const { rpc, createSendBlock, sendDirectMessage, sendGroupMessage } = require('./utils')
 const Accounts = require('./accounts')
 const db = require('../db')
 const constants = require('../constants')
@@ -81,7 +81,7 @@ class Edward {
     await sendDirectMessage({
       userId,
       type,
-      messages: [`Successfully registered receive address: ${address}.`, `Your tip account address is ${accountEntry.custody}.`, 'Tips will be sent from your tip account address, while tips received will go directly to your registered receive address. To send tips send nano to your tip account address.']
+      messages: [`Successfully registered receive address: ${address}.`, `Your tip account address is ${accountEntry.custody}.`, 'Tips will be sent from your tip account address, while tips received will go directly to your registered receive address. To send tips deposit nano to your tip account address.']
     })
 
     return accountEntry
@@ -162,8 +162,24 @@ class Edward {
     // respond to message
   }
 
-  help () {
+  async help ({ groupId, userId, type }) {
+    if (!groupId && !userId) return
+    log(`sending help message to ${groupId || userId}`)
+    const message = `Commands start with "/edward".\n- /edward help\n- /edward register [nano_address]\n- /edward tip [amount] @user\n- /edward rain [amount]`
 
+    if (groupId) {
+      await sendGroupMessage({
+        groupId,
+        type,
+        messages: [message, 'Please ask edward for help via direct messages']
+      })
+    } else if (userId) {
+      await sendDirectMessage({
+        userId,
+        type,
+        messages: [message]
+      })
+    }
   }
 }
 

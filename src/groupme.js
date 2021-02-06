@@ -124,6 +124,11 @@ incoming.on('message', async (msg) => {
       break
 
     case 'help':
+      await edward.help({
+        groupId: msg.data.subject.group_id,
+        userId: msg.data.subject.user_id,
+        type: constants.GROUPME
+      })
       break
   }
 })

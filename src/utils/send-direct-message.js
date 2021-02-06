@@ -9,6 +9,7 @@ const config = require('../../config')
 const sendDirectMessage = async ({ userId, type, messages }) => {
   if (process.env.NODE_ENV !== 'production') return
   if (!messages || !messages.length) return
+  if (!userId) return
 
   log(`sending ${messages.length}  messages to ${userId}`)
 
