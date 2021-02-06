@@ -16,7 +16,7 @@ class Edward {
     this.accounts = new Accounts(seed)
   }
 
-  async _hasFunds ({ accountInfo, amount }) {
+  _hasFunds ({ accountInfo, amount }) {
     const balance = new BigNumber(accountInfo.balance_decimal)
     log(`checking if ${balance} is greater than ${amount}`)
     return balance.isGreaterThanOrEqualTo(amount)
@@ -81,7 +81,13 @@ class Edward {
     await sendDirectMessage({
       userId,
       type,
-      messages: [`Successfully registered receive address: ${address}.`, `Your tip account address is ${accountEntry.custody}.`, 'Tips will be sent from your tip account address, while tips received will go directly to your registered receive address. To send tips deposit nano to your tip account address.']
+      messages: [
+        `Successfully registered receive address: ${address}.`,
+        `Your tip account address is ${accountEntry.custody}.`,
+        'Tips will be sent from your tip account address, ' +
+          'while tips received will go directly to your registered receive address.' +
+          'To send tips deposit nano to your tip account address.'
+      ]
     })
 
     return accountEntry
