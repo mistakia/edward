@@ -27,6 +27,7 @@ class Edward {
   }
 
   async _send ({ senderId, type, amount, receiverId, accountInfo, transactionType }) {
+    log(`sending ${amount} from ${senderId} to ${receiverId}`)
     const senderAccount = await this.accounts.findOrCreate({ userId: senderId, type })
     const receiverAccount = await this.accounts.findOrCreate({ userId: receiverId, type })
     const { data, hash } = await createSendBlock({
@@ -41,12 +42,13 @@ class Edward {
     const signedBlock = block.send(data, accountWallet.privateKey)
 
     if (process.env.NODE_ENV === 'production') {
-      // broadcast transactions
-      await rpc('process', {
+      log(`broadcasting send block: ${hash}`)
+      const res = await rpc('process', {
         json_block: true,
         subtype: 'send',
         block: signedBlock
       })
+      log(`node response: ${res}`)
     }
 
     await db('transactions').insert({
@@ -90,6 +92,7 @@ class Edward {
       account: account.custody,
       representative: true
     })
+    log('sender account info', accountInfo)
 
     const hasFunds = !accountInfo.error && this._hasFunds({ accountInfo, amount: total })
     if (!hasFunds) {
