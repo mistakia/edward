@@ -4,6 +4,7 @@ const bodyParser = require('body-parser')
 const debug = require('debug')
 const GroupMe = require('groupme')
 
+const groupmePubsub = require('./groupme')
 const Edward = require('./index')
 const config = require('../config')
 const constants = require('../constants')
@@ -15,6 +16,7 @@ const app = express()
 
 app.locals.log = debug('server')
 app.locals.edward = new Edward(config.seed)
+app.locals.groupme = groupmePubsub
 if (process.env.NODE_ENV !== 'test') debug.enable('server*')
 
 app.use(bodyParser.json())
