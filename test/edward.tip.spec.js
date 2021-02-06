@@ -1,7 +1,6 @@
 /* global describe before it */
 
 const expect = require('chai').expect
-const { wallet } = require('nanocurrency-web')
 const BigNumber = require('bignumber.js')
 
 const Edward = require('../src/index')

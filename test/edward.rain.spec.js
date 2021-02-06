@@ -2,7 +2,6 @@
 
 const expect = require('chai').expect
 const BigNumber = require('bignumber.js')
-const { wallet } = require('nanocurrency-web')
 
 const Edward = require('../src/index')
 const db = require('../db')

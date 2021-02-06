@@ -8,7 +8,7 @@ const Edward = require('./index')
 const config = require('../config')
 const constants = require('../constants')
 const pkg = require('../package.json')
-const { parseMessage } = require('./utils')
+const { parseMessage, sendDirectMessage, sendGroupMessage } = require('./utils')
 
 const API = GroupMe.Stateless
 const app = express()
@@ -44,12 +44,20 @@ app.post('/groupme', async (req, res) => {
     switch (msg.message) {
       case constants.INVALID_ADDRESS:
       case constants.MISSING_ADDRESS:
-        // TODO - send DM to user
+        await sendDirectMessage({
+          type: constants.GROUPME,
+          message: msg.message,
+          userId: message.user_id
+        })
         break
 
       case constants.MISSING_AMOUNT:
       case constants.INVALID_AMOUNT:
-        // TODO - send message to group
+        await sendGroupMessage({
+          type: constants.GROUPME,
+          message: msg.message,
+          groupId: message.group_id
+        })
         break
     }
 
@@ -59,34 +67,29 @@ app.post('/groupme', async (req, res) => {
   app.locals.log(`[groupme][${msg.command}]`)
   switch (msg.command) {
     case 'register': {
-      const res = await app.locals.register({
+      await app.locals.register({
         userId: message.user_id,
         type: constants.GROUPME,
         address: msg.params.address
       })
-      console.log(res)
-      // Send DM to user
       break
     }
 
     case 'rain': {
       const res = await API.Groups.show.Q(config.groupme.ACCESS_TOKEN, message.group_id)
       console.log(res)
-      // const res = await app.locals.rain({ userId, type: constants.GROUPME, to })
-      // Send DM to all receivers
-      // Send message to group
+      // const blocks = await app.locals.rain({ userId, type: constants.GROUPME, to })
       break
     }
 
     case 'tip': {
       // get all mentions
-      const res = await app.locals.tip({
+      const blocks = await app.locals.tip({
         senderId: message.user_id,
         type: constants.GROUPME,
         receiverIds: []
       })
-      console.log(res)
-      // Send DM to all receivers
+      console.log(blocks)
       break
     }
 

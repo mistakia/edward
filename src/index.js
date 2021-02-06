@@ -1,8 +1,7 @@
 const { block, wallet, tools } = require('nanocurrency-web')
-const nanocurrency = require('nanocurrency')
 const BigNumber = require('bignumber.js')
 
-const { rpc } = require('./utils')
+const { rpc, createSendBlock, sendDirectMessage } = require('./utils')
 const Accounts = require('./accounts')
 const db = require('../db')
 const constants = require('../constants')
@@ -27,23 +26,14 @@ class Edward {
   async _send ({ senderId, type, amount, receiverId, accountInfo, transactionType }) {
     const senderAccount = await this.accounts.findOrCreate({ userId: senderId, type })
     const receiverAccount = await this.accounts.findOrCreate({ userId: receiverId, type })
-    const hash = nanocurrency.hashBlock({
-      account: senderAccount.custody,
-      balance: accountInfo.balance,
-      link: receiverAccount.address || receiverAccount.custody,
-      previous: accountInfo.frontier,
-      representative: accountInfo.representative
-    })
-    const work = await nanocurrency.computeWork(hash)
-    const data = {
-      walletBalanceRaw: accountInfo.balance,
+    const { data, hash } = await createSendBlock({
+      balanceRaw: accountInfo.balance,
       fromAddress: senderAccount.custody,
       toAddress: receiverAccount.address || receiverAccount.custody,
       representativeAddress: accountInfo.representative,
       frontier: accountInfo.frontier,
-      amountRaw: tools.convert(amount, 'NANO', 'RAW'),
-      work
-    }
+      amountRaw: tools.convert(amount, 'NANO', 'RAW')
+    })
     const accountWallet = this._getWallet(senderAccount.uid)
     const signedBlock = block.send(data, accountWallet.privateKey)
 
@@ -65,11 +55,23 @@ class Edward {
       type: transactionType
     })
 
+    // TODO use sender name
+    let message = `Received ${amount.toString()} NANO tip from ${senderId}.`
+    if (!receiverAccount.address) {
+      message += ' Register your wallet address to collect your tip. Type "/edward help" for more info'
+    }
+    await sendDirectMessage({ userId: receiverId, type, message })
+
     return signedBlock
   }
 
   async register ({ userId, type, address }) {
-    return this.accounts.register({ userId, type, address })
+    const accountEntry = await this.accounts.register({ userId, type, address })
+    await sendDirectMessage({
+      userId,
+      type,
+      message: `Successfully registered receive address: ${address}. Your tip account address is ${accountEntry.custody}. Tips will be sent from your tip account address, while tips received will go directly to your registered receive address.`
+    })
   }
 
   async tip ({ senderId, type, receiverIds, amount }) {
@@ -122,6 +124,12 @@ class Edward {
       blocks.push(block)
     }
 
+    // TODO - send make it rain gif
+    /* await sendGroupMessage({
+     *   type,
+     *   groupId
+     * })
+     */
     return blocks
   }
 

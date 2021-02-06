@@ -36,6 +36,11 @@ class Accounts {
     return rows[0]
   }
 
+  async getFromCustodyAddress (address) {
+    const rows = await db('accounts').where({ custody: address })
+    return rows[0]
+  }
+
   async findOrCreate ({ userId, type }) {
     const account = await this.get({ userId, type })
     if (account) return account
