@@ -1,4 +1,5 @@
-const IncomingStream = require('groupme').IncomingStream
+const GroupMe = require('groupme')
+const API = GroupMe.Stateless
 
 const config = require('../config')
 
