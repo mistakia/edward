@@ -49,7 +49,7 @@ incoming.on('message', async (msg) => {
       case constants.MISSING_ADDRESS:
         await sendDirectMessage({
           type: constants.GROUPME,
-          message: parsed.message,
+          messages: [parsed.message],
           userId: msg.data.subject.user_id
         })
         break
@@ -64,7 +64,7 @@ incoming.on('message', async (msg) => {
 
         await sendGroupMessage({
           type: constants.GROUPME,
-          message: parsed.message,
+          messages: [parsed.message],
           groupId: groupId
         })
         break
@@ -93,8 +93,14 @@ incoming.on('message', async (msg) => {
       }
 
       const res = await API.Groups.show.Q(config.groupme.ACCESS_TOKEN, groupId)
-      log(res)
-      // await edward.rain({ userId, type: constants.GROUPME, to })
+      const receiverIds = res.members.map(m => m.user_id)
+      await edward.rain({
+        senderId: msg.data.subject.user_id,
+        senderName: msg.data.subject.name,
+        type: constants.GROUPME,
+        amount: parsed.params.amount,
+        receiverIds
+      })
       break
     }
 
@@ -110,6 +116,7 @@ incoming.on('message', async (msg) => {
 
       await edward.tip({
         senderId: msg.data.subject.user_id,
+        senderName: msg.data.subject.name,
         type: constants.GROUPME,
         amount: parsed.params.amount,
         receiverIds

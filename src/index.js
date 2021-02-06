@@ -27,7 +27,9 @@ class Edward {
     return accountWallet[0]
   }
 
-  async _send ({ senderId, type, amount, receiverId, accountInfo, transactionType }) {
+  async _send ({
+    senderId, type, amount, receiverId, accountInfo, transactionType, senderName
+  }) {
     log(`sending ${amount} from ${senderId} to ${receiverId}`)
     const senderAccount = await this.accounts.findOrCreate({ userId: senderId, type })
     const receiverAccount = await this.accounts.findOrCreate({ userId: receiverId, type })
@@ -66,12 +68,11 @@ class Edward {
       type: transactionType
     })
 
-    // TODO use sender name
-    let message = `Received ${amount.toString()} NANO tip from ${senderId}.`
+    const messages = [`Received ${amount.toString()} NANO tip from ${senderName}.`]
     if (!receiverAccount.address) {
-      message += ' Register your wallet address to collect your tip. Type "/edward help" for more info'
+      messages.push('Register a wallet address to receive tips directly in the future. Type "/edward help" for more info')
     }
-    await sendDirectMessage({ userId: receiverId, type, message })
+    await sendDirectMessage({ userId: receiverId, type, messages })
   }
 
   async register ({ userId, type, address }) {
@@ -93,7 +94,7 @@ class Edward {
     return accountEntry
   }
 
-  async tip ({ senderId, type, receiverIds, amount }) {
+  async tip ({ senderId, type, receiverIds, amount, senderName }) {
     if (!senderId || !type || !amount) return
     if (!receiverIds || !receiverIds.length) return
 
@@ -119,12 +120,13 @@ class Edward {
         amount,
         receiverId,
         accountInfo,
+        senderName,
         transactionType: constants.TRANSACTIONS.TIP
       })
     }
   }
 
-  async rain ({ senderId, type, receiverIds, amount }) {
+  async rain ({ senderId, type, receiverIds, amount, senderName }) {
     if (!senderId || !type || !amount) return
     if (!receiverIds || !receiverIds.length) return
 
@@ -145,6 +147,7 @@ class Edward {
         amount: each,
         receiverId,
         accountInfo,
+        senderName,
         transactionType: constants.TRANSACTIONS.RAIN
       })
     }
@@ -171,19 +174,20 @@ class Edward {
   async help ({ groupId, userId, type }) {
     if (!groupId && !userId) return
     log(`sending help message to ${groupId || userId}`)
-    const message = `Commands start with "/edward".\n- /edward help\n- /edward register [nano_address]\n- /edward tip [amount] @user\n- /edward rain [amount]`
+    const messages = ['Commands start with "/edward".\n- /edward help\n- /edward register [nano_address]\n- /edward tip [amount] @user\n- /edward rain [amount]']
 
     if (groupId) {
+      messages.push('Please ask edward for help via direct messages')
       await sendGroupMessage({
         groupId,
         type,
-        messages: [message, 'Please ask edward for help via direct messages']
+        messages
       })
     } else if (userId) {
       await sendDirectMessage({
         userId,
         type,
-        messages: [message]
+        messages
       })
     }
   }
