@@ -18,6 +18,7 @@ class Edward {
 
   async _hasFunds ({ accountInfo, amount }) {
     const balance = new BigNumber(accountInfo.balance_decimal)
+    log(`checking if ${balance} is greater than ${amount}`)
     return balance.isGreaterThanOrEqualTo(amount)
   }
 
@@ -48,7 +49,7 @@ class Edward {
         subtype: 'send',
         block: signedBlock
       })
-      log(`node response: ${res}`)
+      log('node response', res)
     }
 
     await db('transactions').insert({

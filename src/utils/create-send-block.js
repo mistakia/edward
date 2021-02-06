@@ -18,8 +18,10 @@ const createSendBlock = async ({
     previous: frontier,
     representative: representativeAddress
   })
-  log(`generating work for send block ${hash}`)
-  const work = await nanocurrency.computeWork(hash, { workThreshold: 'fffffff800000000' })
+  log(`generating work against ${frontier} for send block ${hash}`)
+  const work = await nanocurrency.computeWork(frontier, {
+    workThreshold: 'fffffff800000000'
+  })
 
   return {
     hash,
