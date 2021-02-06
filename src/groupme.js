@@ -100,11 +100,13 @@ incoming.on('message', async (msg) => {
 
     case 'tip': {
       // get all mentions
-      log(msg.data.subject.attachments)
+      const mentions = msg.data.subject.attachments.filter(m => m.type === 'mentions')
+      const userIds = mentions.map(m => m.user_ids).flat()
+      const receiverIds = Array.from(new Set(userIds))
       const blocks = await edward.tip({
         senderId: msg.data.subject.user_id,
         type: constants.GROUPME,
-        receiverIds: []
+        receiverIds
       })
       log(blocks)
       break

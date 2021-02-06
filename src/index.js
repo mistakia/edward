@@ -1,10 +1,13 @@
 const { block, wallet, tools } = require('nanocurrency-web')
 const BigNumber = require('bignumber.js')
+const debug = require('debug')
 
 const { rpc, createSendBlock, sendDirectMessage } = require('./utils')
 const Accounts = require('./accounts')
 const db = require('../db')
 const constants = require('../constants')
+
+const log = debug('edward')
 
 class Edward {
   constructor (seed) {
@@ -66,6 +69,7 @@ class Edward {
   }
 
   async register ({ userId, type, address }) {
+    log(`register ${address} for ${userId}:${type}`)
     const accountEntry = await this.accounts.register({ userId, type, address })
     await sendDirectMessage({
       userId,
@@ -75,6 +79,7 @@ class Edward {
   }
 
   async tip ({ senderId, type, receiverIds, amount }) {
+    log(`tip from ${senderId} to ${receiverIds} for ${amount}`)
     const account = await this.accounts.findOrCreate({ userId: senderId, type })
     const total = amount.multipliedBy(receiverIds.length)
     const accountInfo = await rpc('account_info', {
@@ -102,6 +107,7 @@ class Edward {
   }
 
   async rain ({ senderId, type, receiverIds, amount }) {
+    log(`rain from ${senderId} to ${receiverIds} for ${amount}`)
     const account = await this.accounts.findOrCreate({ userId: senderId, type })
     const accountInfo = await rpc('account_info', {
       account: account.custody,
