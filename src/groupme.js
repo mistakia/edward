@@ -111,6 +111,7 @@ incoming.on('message', async (msg) => {
       const blocks = await edward.tip({
         senderId: msg.data.subject.user_id,
         type: constants.GROUPME,
+        amount: parsed.params.amount,
         receiverIds
       })
       log(blocks)
