@@ -69,6 +69,7 @@ class Edward {
   }
 
   async register ({ userId, type, address }) {
+    if (!userId || !type || !address) return
     log(`register ${address} for ${userId}:${type}`)
     const accountEntry = await this.accounts.register({ userId, type, address })
     await sendDirectMessage({
@@ -79,6 +80,9 @@ class Edward {
   }
 
   async tip ({ senderId, type, receiverIds, amount }) {
+    if (!senderId || !type || !amount) return
+    if (!receiverIds || !receiverIds.length) return
+
     log(`tip from ${senderId} to ${receiverIds} for ${amount}`)
     const account = await this.accounts.findOrCreate({ userId: senderId, type })
     const total = amount.multipliedBy(receiverIds.length)
@@ -107,6 +111,9 @@ class Edward {
   }
 
   async rain ({ senderId, type, receiverIds, amount }) {
+    if (!senderId || !type || !amount) return
+    if (!receiverIds || !receiverIds.length) return
+
     log(`rain from ${senderId} to ${receiverIds} for ${amount}`)
     const account = await this.accounts.findOrCreate({ userId: senderId, type })
     const accountInfo = await rpc('account_info', {
