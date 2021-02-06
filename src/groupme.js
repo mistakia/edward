@@ -94,7 +94,7 @@ incoming.on('message', async (msg) => {
 
       const res = await API.Groups.show.Q(config.groupme.ACCESS_TOKEN, groupId)
       log(res)
-      // const blocks = await edward.rain({ userId, type: constants.GROUPME, to })
+      // await edward.rain({ userId, type: constants.GROUPME, to })
       break
     }
 
@@ -108,13 +108,12 @@ incoming.on('message', async (msg) => {
         return
       }
 
-      const blocks = await edward.tip({
+      await edward.tip({
         senderId: msg.data.subject.user_id,
         type: constants.GROUPME,
         amount: parsed.params.amount,
         receiverIds
       })
-      log(blocks)
       break
     }
 

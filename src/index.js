@@ -50,6 +50,11 @@ class Edward {
         block: signedBlock
       })
       log('node response', res)
+
+      if (res.error) {
+        // TODO send notification
+        return
+      }
     }
 
     await db('transactions').insert({
@@ -67,8 +72,6 @@ class Edward {
       message += ' Register your wallet address to collect your tip. Type "/edward help" for more info'
     }
     await sendDirectMessage({ userId: receiverId, type, message })
-
-    return signedBlock
   }
 
   async register ({ userId, type, address }) {
@@ -80,6 +83,8 @@ class Edward {
       type,
       message: `Successfully registered receive address: ${address}. Your tip account address is ${accountEntry.custody}. Tips will be sent from your tip account address, while tips received will go directly to your registered receive address.`
     })
+
+    return accountEntry
   }
 
   async tip ({ senderId, type, receiverIds, amount }) {
@@ -101,9 +106,8 @@ class Edward {
       return { message: constants.INSUFFICENT_FUNDS }
     }
 
-    const blocks = []
     for (const receiverId of receiverIds) {
-      const block = await this._send({
+      await this._send({
         senderId,
         type,
         amount,
@@ -111,10 +115,7 @@ class Edward {
         accountInfo,
         transactionType: constants.TRANSACTIONS.TIP
       })
-      blocks.push(block)
     }
-
-    return { blocks }
   }
 
   async rain ({ senderId, type, receiverIds, amount }) {
@@ -130,10 +131,9 @@ class Edward {
     const hasFunds = this._hasFunds({ accountInfo, amount })
     if (!hasFunds) return { message: constants.INSUFFICENT_FUNDS }
 
-    const blocks = []
     const each = amount.dividedBy(receiverIds.length)
     for (const receiverId of receiverIds) {
-      const block = await this._send({
+      await this._send({
         senderId,
         type,
         amount: each,
@@ -141,7 +141,6 @@ class Edward {
         accountInfo,
         transactionType: constants.TRANSACTIONS.RAIN
       })
-      blocks.push(block)
     }
 
     // TODO - send make it rain gif
@@ -150,7 +149,6 @@ class Edward {
      *   groupId
      * })
      */
-    return { blocks }
   }
 
   async info ({ userId, type }) {

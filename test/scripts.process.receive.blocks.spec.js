@@ -18,18 +18,18 @@ describe('scripts process receive blocks', function () {
   })
 
   it('process', async () => {
-    const edward = new Edward(config.seed)
-    for (let i = 1; i < 5; i++) {
-      await edward.accounts.create({ userId: `${i}`, type: constants.GROUPME })
-    }
+    /* const edward = new Edward(config.seed)
+     * for (let i = 1; i < 5; i++) {
+     *   await edward.accounts.create({ userId: `${i}`, type: constants.GROUPME })
+     * }
 
-    let error
-    try {
-      await run()
-    } catch (err) {
-      error = err
-    }
+     * let error
+     * try {
+     *   await run()
+     * } catch (err) {
+     *   error = err
+     * }
 
-    expect(error).to.equal(undefined)
+     * expect(error).to.equal(undefined) */
   })
 })

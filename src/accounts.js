@@ -9,20 +9,24 @@ class Accounts {
 
   async register ({ userId, type, address }) {
     const entry = await this.get({ userId, type })
-    if (entry) return entry
+    if (entry && (address === entry.address || !address)) return entry
 
-    const res = await db('accounts').insert({ user_id: userId, type, address })
-    const uid = res[0]
-    const accounts = wallet.accounts(this.seed, uid, uid)
-    const account = accounts[0]
+    if (!entry) {
+      const res = await db('accounts').insert({ userId, type, address })
+      const uid = res[0]
+      const accounts = wallet.accounts(this.seed, uid, uid)
+      const account = accounts[0]
 
-    await db('accounts').update({ custody: account.address }).where({ uid })
+      await db('accounts').update({ custody: account.address }).where({ uid })
+    } else if (address && address !== entry.address) {
+      await db('accounts').update({ address }).where({ userId, type })
+    }
 
     return this.get({ userId, type })
   }
 
   async create ({ userId, type }) {
-    const res = await db('accounts').insert({ user_id: userId, type })
+    const res = await db('accounts').insert({ userId, type })
     const uid = res[0]
     const accounts = wallet.accounts(this.seed, uid, uid)
     const account = accounts[0]
@@ -32,7 +36,7 @@ class Accounts {
   }
 
   async get ({ userId, type }) {
-    const rows = await db('accounts').where({ user_id: userId, type })
+    const rows = await db('accounts').where({ userId, type })
     return rows[0]
   }
 

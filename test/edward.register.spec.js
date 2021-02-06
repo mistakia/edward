@@ -36,7 +36,7 @@ describe('edward.register', function () {
 
     const row = rows[0]
     expect(row.uid).to.equal(1)
-    expect(row.user_id).to.equal(userId)
+    expect(row.userId).to.equal(userId)
     expect(row.address).to.equal(account.address)
     expect(row.type).to.equal(constants.GROUPME)
   })
@@ -44,8 +44,23 @@ describe('edward.register', function () {
   it('duplicate', async () => {
     const userId = '1'
 
+    const address = 'nano_3x4ui45q1cw8hydmfdn4ec5ijsdqi4ryp14g4ayh71jcdkwmddrq7ca9xzn9'
     const edward = new Edward(config.seed)
-    const account = await edward.register({ userId, type: constants.GROUPME })
+    const account = await edward.register({ userId, type: constants.GROUPME, address })
+    const rows = await db('accounts')
+    expect(rows).to.be.an('array')
+    expect(rows.length).to.be.equal(1)
+
+    const row = rows[0]
+    expect(row.address).to.equal(account.address)
+  })
+
+  it('update', async () => {
+    const userId = '1'
+
+    const address = 'nano_3p6umrmtyj8ofk3yfk549oscjd86puyaftonmcejoia33bf398oym31tdoq4'
+    const edward = new Edward(config.seed)
+    const account = await edward.register({ userId, type: constants.GROUPME, address })
     const rows = await db('accounts')
     expect(rows).to.be.an('array')
     expect(rows.length).to.be.equal(1)

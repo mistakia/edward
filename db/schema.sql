@@ -18,12 +18,12 @@ CREATE TABLE `accounts` (
   `uid` int(11) NOT NULL AUTO_INCREMENT,
   `address` varchar(100) DEFAULT NULL,
   `custody` varchar(100) DEFAULT NULL,
-  `user_id` varchar(100) NOT NULL,
+  `userId` varchar(100) NOT NULL,
   `type` int(1) NOT NULL,
   PRIMARY KEY `uid` (`uid`),
-  UNIQUE KEY `user` (`user_id`,`type`),
+  UNIQUE KEY `user` (`userId`,`type`),
   UNIQUE KEY `custody` (`custody`),
-  KEY `user_id` (`user_id`)
+  KEY `userId` (`userId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
