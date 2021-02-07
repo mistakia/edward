@@ -94,7 +94,8 @@ incoming.on('message', async (msg) => {
       const res = await API.Groups.show.Q(config.groupme.ACCESS_TOKEN, groupId)
       const receiverIds = res.members
         .map(m => m.user_id)
-        .filter(userId => userId !== msg.data.subject.user_id)
+        .filter(userId => userId !== msg.data.subject.user_id &&
+          userId !== config.groupme.USER_ID)
 
       await edward.rain({
         groupId,
@@ -116,7 +117,10 @@ incoming.on('message', async (msg) => {
 
       // get all mentions
       const mentions = msg.data.subject.attachments.filter(m => m.type === 'mentions')
-      const userIds = mentions.map(m => m.user_ids).flat()
+      const userIds = mentions
+        .map(m => m.user_ids)
+        .flat()
+        .filter(userId => userId !== config.groupme.USER_ID)
       const receiverIds = Array.from(new Set(userIds))
       if (!receiverIds.length) {
         // TODO - send notification

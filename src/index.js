@@ -14,6 +14,7 @@ const precompute = require('./precompute')
 const Accounts = require('./accounts')
 const db = require('../db')
 const constants = require('../constants')
+const config = require('../config')
 
 const log = debug('edward')
 
@@ -39,6 +40,10 @@ class Edward {
   async _send ({
     senderId, type, amount, receiverId, accountInfo, transactionType, senderName
   }) {
+    if (receiverId === config.groupme.USER_ID) {
+      // TODO send notification
+      return
+    }
     log(`sending ${amount} from ${senderId} to ${receiverId}`)
     const senderAccount = await this.accounts.findOrCreate({ userId: senderId, type })
     const receiverAccount = await this.accounts.findOrCreate({ userId: receiverId, type })
@@ -79,7 +84,7 @@ class Edward {
       type: transactionType
     })
 
-    const messages = [`Received ${amount.toString()} NANO tip from ${senderName}.`]
+    const messages = [`Received ${amount.toFixed()} NANO tip from ${senderName}.`]
     if (!receiverAccount.address) {
       messages.push('Register a wallet address to receive tips directly in the future. Type "/edward help" for more info')
     }
