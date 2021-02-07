@@ -1,6 +1,9 @@
 module.exports = {
   GROUPME: 1,
 
+  RECEIVE_DIFFICULTY: 'fffffe0000000000',
+  BASE_DIFFICULTY: 'fffffff800000000',
+
   COMMANDS: ['tip', 'register', 'rain', 'stats', 'info', 'help'],
 
   MISSING_KEYWORD: 'Message missing keyword',

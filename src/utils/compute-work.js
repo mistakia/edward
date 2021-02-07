@@ -20,7 +20,7 @@ const createWorker = (hash, difficulty) => {
 }
 
 if (isMainThread) {
-  module.exports = async (hash) => {
+  module.exports = async (hash, difficulty) => {
     if (process.env.NODE_ENV !== 'production') return 'x'
 
     const rows = await db('work').where({ hash })
@@ -29,7 +29,7 @@ if (isMainThread) {
       return rows[0].work
     }
 
-    return createWorker(hash)
+    return createWorker(hash, difficulty)
   }
 } else {
   log(`computing work against ${workerData.hash}`)

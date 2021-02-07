@@ -35,7 +35,10 @@ class Accounts {
     const accounts = wallet.accounts(this.seed, uid, uid)
     const account = accounts[0]
 
-    await db('accounts').update({ custody: account.address }).where({ uid })
+    await db('accounts').update({
+      custody: account.address,
+      publicKey: account.publicKey
+    }).where({ uid })
     precompute.check([account.address])
     return this.get({ userId, type })
   }

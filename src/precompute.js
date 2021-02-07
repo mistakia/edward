@@ -6,6 +6,7 @@ const log = debug('nano:precompute')
 
 const { computeWork, rpc } = require('./utils')
 const db = require('../db')
+const constants = require('../constants')
 
 const init = async () => {
   const accounts = await db('accounts').select('custody')
@@ -24,7 +25,7 @@ const check = async (addresses) => {
   for (const address in res.frontiers) {
     const frontier = res.frontiers[address]
     const rows = await db('work').where({ hash: frontier })
-    if (!rows.length) add(frontier)
+    if (!rows.length) add(frontier, constants.BASE_DIFFICULTY)
   }
 
   const openedAddresses = Object.keys(res.frontiers)
@@ -36,15 +37,15 @@ const check = async (addresses) => {
       .whereIn('custody', unOpenedAddresses)
     for (const address of unOpenedAddresses) {
       const { publicKey } = rows.find(r => r.custody === address)
-      add(publicKey)
+      add(publicKey, constants.BASE_DIFFICULTY)
     }
   }
 }
 
-const add = (hash) => {
+const add = (hash, difficulty) => {
   log(`queueing precompute work for ${hash}`)
   queue.add(async () => {
-    const work = await computeWork(hash)
+    const work = await computeWork(hash, difficulty)
     log(`saving precomputed work ${work} for ${hash}`)
     await db('work').insert({ hash, work }).onConflict().ignore()
   })
