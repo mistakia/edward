@@ -138,7 +138,11 @@ incoming.on('message', async (msg) => {
       break
     }
 
-    case 'info':
+    case 'balance':
+      await edward.balance({
+        userId: msg.data.subject.user_id,
+        type: constants.GROUPME
+      })
       break
 
     case 'stats':

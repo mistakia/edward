@@ -18,8 +18,8 @@ describe('constructor', function () {
     expect(edward.register).to.be.a('function')
     expect(edward.rain).to.be.a('function')
     expect(edward.stats).to.be.a('function')
-    expect(edward.info).to.be.a('function')
     expect(edward.help).to.be.a('function')
+    expect(edward.balance).to.be.a('function')
 
     const account = edward.wallet.accounts[0]
     expect(account.accountIndex).to.equal(0)

@@ -190,9 +190,20 @@ class Edward {
     })
   }
 
-  async info ({ userId, type }) {
-    const { custody } = await this.accounts.get({ userId, type })
-    return rpc('account_info', { account: custody, representative: true })
+  async balance ({ userId, type }) {
+    const accountEntry = await this.accounts.findOrCreate({ userId, type })
+    const accountInfo = await rpc('account_info', {
+      account: accountEntry.custody
+    })
+
+    const balanceRaw = !accountInfo.error ? accountInfo.balance : '0'
+    const balanceNano = tools.convert(balanceRaw, 'RAW', 'NANO')
+    const balance = new BigNumber(balanceNano)
+    await sendDirectMessage({
+      userId,
+      type,
+      messages: [`Tip balance of ${balance.toFixed()} NANO`]
+    })
   }
 
   stats () {
@@ -204,7 +215,7 @@ class Edward {
   async help ({ groupId, userId, type }) {
     if (!groupId && !userId) return
     log(`sending help message to ${groupId || userId}`)
-    const messages = ['Commands start with /edward.\n/edward help\n/edward register [nano_address]\n/edward tip [amount] @user\n/edward rain [amount]']
+    const messages = ['Commands start with /edward.\n/edward help\n/edward register [nano_address]\n/edward tip [amount] @user\n/edward rain [amount]\n/edward balance']
 
     if (groupId) {
       messages.push('Please ask edward for help via direct messages')

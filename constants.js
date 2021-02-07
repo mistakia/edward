@@ -4,7 +4,7 @@ module.exports = {
   RECEIVE_DIFFICULTY: 'fffffe0000000000',
   BASE_DIFFICULTY: 'fffffff800000000',
 
-  COMMANDS: ['tip', 'register', 'rain', 'stats', 'info', 'help'],
+  COMMANDS: ['tip', 'register', 'rain', 'stats', 'balance', 'help'],
 
   MISSING_KEYWORD: 'Message missing keyword',
   MISSING_COMMAND: 'Missing command, enter "/wisdom help" for more info',

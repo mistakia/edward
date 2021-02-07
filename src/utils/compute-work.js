@@ -32,7 +32,7 @@ if (isMainThread) {
     return createWorker(hash, difficulty)
   }
 } else {
-  log(`computing work against ${workerData.hash}`)
+  log(`computing work against ${workerData.hash} at ${workerData.difficulty} difficulty`)
   nanocurrency.computeWork(workerData.hash, {
     workThreshold: workerData.difficulty
   }).then((work) => {
