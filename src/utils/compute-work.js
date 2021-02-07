@@ -25,8 +25,8 @@ if (isMainThread) {
 
     const rows = await db('work').where({ hash })
     if (rows.length) {
-      log(`found precomputed work (${rows[0]}) against ${hash}`)
-      return rows[0]
+      log(`found precomputed work (${rows[0].work}) against ${hash}`)
+      return rows[0].work
     }
 
     return createWorker(hash)

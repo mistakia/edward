@@ -21,6 +21,8 @@ const run = async () => {
     source: true
   })
 
+  log(`found pending blocks for ${Object.values(res.blocks).filter(Boolean).length} accounts`)
+
   for (const address in res.blocks) {
     if (!res.blocks[address]) continue
 
