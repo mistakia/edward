@@ -2,7 +2,7 @@ const { Worker, isMainThread, parentPort, workerData } = require('worker_threads
 const debug = require('debug')
 const nanocurrency = require('nanocurrency')
 
-const log = debug('compute-work')
+const log = debug('nano:compute-work')
 
 const db = require('../../db')
 

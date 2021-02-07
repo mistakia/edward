@@ -2,7 +2,7 @@ const { default: PQueue } = require('p-queue')
 const debug = require('debug')
 
 const queue = new PQueue({ concurrency: 1 })
-const log = debug('precompute')
+const log = debug('nano:precompute')
 
 const { computeWork, rpc } = require('./utils')
 const db = require('../db')

@@ -1,6 +1,6 @@
 const { block } = require('nanocurrency-web')
 const debug = require('debug')
-const log = debug('scripts:process-receive-blocks')
+const log = debug('nano:pending-blocks')
 
 const db = require('../db')
 const config = require('../config')
@@ -81,6 +81,8 @@ const run = async () => {
         accountState.frontier = res.hash
         // update account balance
         accountState.balanceRaw = signedBlock.balance
+
+        // TODO - send direct message to user
       }
     }
   }

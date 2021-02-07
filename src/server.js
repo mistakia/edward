@@ -13,7 +13,7 @@ const app = express()
 app.locals.log = debug('server')
 app.locals.edward = new Edward(config.seed)
 app.locals.groupme = groupmePubsub
-if (process.env.NODE_ENV !== 'test') debug.enable('server*,groupme*,edward,send-block,receive-block,compute-work,precompute')
+if (process.env.NODE_ENV !== 'test') debug.enable('server*,groupme*,edward*,nano*')
 
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))

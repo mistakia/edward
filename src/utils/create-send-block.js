@@ -1,7 +1,7 @@
 const debug = require('debug')
 const nanocurrency = require('nanocurrency')
 
-const log = debug('send-block')
+const log = debug('nano:send-block')
 const computeWork = require('./compute-work')
 
 const createSendBlock = async ({
