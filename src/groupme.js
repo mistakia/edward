@@ -19,7 +19,7 @@ const incoming = new GroupMe.IncomingStream(
 // This waits for the IncomingStream to complete its handshake and start listening.
 // We then get the bot id of a specific bot.
 incoming.on('connected', () => {
-  log("[IncomingStream 'connected']")
+  log('connected')
 })
 
 // This waits for messages coming in from the IncomingStream
@@ -32,7 +32,6 @@ incoming.on('message', async (msg) => {
     return
   }
 
-  log("[IncomingStream 'message'] Message Received")
   log(msg)
 
   /* if (message.group_id !== config.groupme.GROUP_ID) {
@@ -93,7 +92,10 @@ incoming.on('message', async (msg) => {
       }
 
       const res = await API.Groups.show.Q(config.groupme.ACCESS_TOKEN, groupId)
-      const receiverIds = res.members.map(m => m.user_id)
+      const receiverIds = res.members
+        .map(m => m.user_id)
+        .filter(userId => userId !== msg.data.subject.user_id)
+
       await edward.rain({
         groupId,
         senderId: msg.data.subject.user_id,
@@ -150,13 +152,13 @@ incoming.on('message', async (msg) => {
 
 // This listens for the bot to disconnect
 incoming.on('disconnected', () => {
-  log("[IncomingStream 'disconnect']")
+  log('disconnected')
   // TODO - reconnect
 })
 
 // This listens for an error to occur on the Websockets IncomingStream.
 incoming.on('error', (message, payload) => {
-  log("[IncomingStream 'error']", message, payload)
+  log('error', message, payload)
   // TODO - reconnect
 })
 

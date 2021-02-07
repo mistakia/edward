@@ -13,7 +13,7 @@ const run = async () => {
 
   const accounts = await db('accounts')
 
-  log(`getting pending blocks for ${accounts.length} length`)
+  log(`checking pending blocks for ${accounts.length} accounts`)
 
   const addresses = accounts.map(p => p.custody)
   const res = await rpc('accounts_pending', {
@@ -68,7 +68,7 @@ const run = async () => {
 
       console.log(signedBlock)
 
-      if (process.env.NODE_ENV === 'test') {
+      if (process.env.NODE_ENV === 'production') {
         log(`broadcasting block ${blockHash} for ${address}`)
         // broadcast transaction
         const res = await rpc('process', {
@@ -77,7 +77,6 @@ const run = async () => {
           block: signedBlock
         })
         console.log(res)
-        console.log(hash)
         // update account frontier
         accountState.frontier = res.hash
         // update account balance

@@ -18,6 +18,7 @@ CREATE TABLE `accounts` (
   `uid` int(11) NOT NULL AUTO_INCREMENT,
   `address` varchar(100) DEFAULT NULL,
   `custody` varchar(100) DEFAULT NULL,
+  `publicKey` varchar(64) DEFAULT NULL,
   `userId` varchar(100) NOT NULL,
   `type` int(1) NOT NULL,
   PRIMARY KEY `uid` (`uid`),
@@ -43,6 +44,20 @@ CREATE TABLE `transactions` (
   `timestamp` int(11) DEFAULT NULL,
   KEY `uid` (`uid`),
   KEY `address` (`address`),
+  UNIQUE KEY `hash` (`hash`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `work`
+--
+
+DROP TABLE IF EXISTS `work`;
+
+CREATE TABLE `work` (
+  `hash` varchar(64) NOT NULL,
+  `work` varchar(64) NOT NULL,
   UNIQUE KEY `hash` (`hash`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 

@@ -10,6 +10,7 @@ const {
   sendGroupImage,
   randomGif
 } = require('./utils')
+const precompute = require('./precompute')
 const Accounts = require('./accounts')
 const db = require('../db')
 const constants = require('../constants')
@@ -64,6 +65,8 @@ class Edward {
         // TODO send notification
         return
       }
+
+      precompute.check([senderAccount.custody])
     }
 
     await db('transactions').insert({

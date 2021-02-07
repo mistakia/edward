@@ -10,5 +10,6 @@ module.exports = {
   createReceiveBlock: require('./create-receive-block'),
   sendDirectMessage: require('./send-direct-message'),
   sendGroupMessage: require('./send-group-message'),
-  sendGroupImage: require('./send-group-image')
+  sendGroupImage: require('./send-group-image'),
+  computeWork: require('./compute-work')
 }
