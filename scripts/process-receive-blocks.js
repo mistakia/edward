@@ -1,4 +1,4 @@
-const { block } = require('nanocurrency-web')
+const { block, tools } = require('nanocurrency-web')
 const debug = require('debug')
 const log = debug('nano:pending-blocks')
 
@@ -6,7 +6,8 @@ const db = require('../db')
 const config = require('../config')
 const constants = require('../constants')
 const Edward = require('../src/index')
-const { rpc, createReceiveBlock } = require('../src/utils')
+const precompute = require('../src/precompute')
+const { rpc, createReceiveBlock, sendDirectMessage } = require('../src/utils')
 
 const run = async () => {
   const edward = new Edward(config.seed)
@@ -45,15 +46,12 @@ const run = async () => {
 
     const accountEntry = await edward.accounts.getFromCustodyAddress(address)
     const accountWallet = edward._getWallet(accountEntry.uid)
-
-    // get account info if there are blocks
-    console.log(res.blocks[address])
-    for (const blockHash in res.blocks[address]) {
+    const processBlock = async (blockHash) => {
       log(`processing block ${blockHash} for ${address}`)
       const blockInfo = res.blocks[address][blockHash]
 
       const { balanceRaw, representativeAddress, frontier } = accountState
-      const { data, hash } = await createReceiveBlock({
+      const { data } = await createReceiveBlock({
         balanceRaw,
         representativeAddress,
         frontier,
@@ -64,29 +62,37 @@ const run = async () => {
         publicKey: accountWallet.publicKey
       })
 
-      console.log(data)
-
       const signedBlock = block.receive(data, accountWallet.privateKey)
-
-      console.log(signedBlock)
-
       if (process.env.NODE_ENV === 'production') {
         log(`broadcasting block ${blockHash} for ${address}`)
-        // broadcast transaction
         const res = await rpc('process', {
           json_block: true,
           subtype: 'receive',
           block: signedBlock
         })
-        console.log(res)
-        // update account frontier
-        accountState.frontier = res.hash
-        // update account balance
-        accountState.balanceRaw = signedBlock.balance
 
-        // TODO - send direct message to user
+        log(res)
+        if (!res.error) {
+          // update account frontier
+          accountState.frontier = res.hash
+          // update account balance
+          accountState.balanceRaw = signedBlock.balance
+
+          const amountNano = tools.convert(blockInfo.amount, 'RAW', 'NANO')
+          await sendDirectMessage({
+            userId: accountEntry.userId,
+            type: accountEntry.type,
+            messages: [`Received deposit of ${amountNano} to tip address`]
+          })
+        }
       }
     }
+
+    for (const blockHash in res.blocks[address]) {
+      await processBlock(blockHash)
+    }
+
+    precompute.check(accountState.frontier)
   }
 }
 
