@@ -23,7 +23,7 @@ const createReceiveBlock = async ({
   })
   const workHash = isOpen ? publicKey : frontier
   log(`generating work against ${workHash} for receive block ${hash}`)
-  const work = await computeWork(workHash)
+  const work = await computeWork(workHash, 'fffffe0000000000')
 
   return {
     hash,

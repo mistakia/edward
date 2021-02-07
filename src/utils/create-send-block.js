@@ -20,7 +20,7 @@ const createSendBlock = async ({
     representative: representativeAddress
   })
   log(`generating work against ${frontier} for send block ${hash}`)
-  const work = await computeWork(frontier)
+  const work = await computeWork(frontier, 'fffffff800000000')
 
   return {
     hash,

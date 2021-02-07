@@ -6,9 +6,9 @@ const log = debug('nano:compute-work')
 
 const db = require('../../db')
 
-const createWorker = (hash) => {
+const createWorker = (hash, difficulty) => {
   return new Promise((resolve, reject) => {
-    const worker = new Worker(__filename, { workerData: { hash } })
+    const worker = new Worker(__filename, { workerData: { hash, difficulty } })
     worker.on('message', resolve)
     worker.on('error', reject)
     worker.on('exit', (code) => {
@@ -34,7 +34,7 @@ if (isMainThread) {
 } else {
   log(`computing work against ${workerData.hash}`)
   nanocurrency.computeWork(workerData.hash, {
-    workThreshold: 'fffffff800000000'
+    workThreshold: workerData.difficulty
   }).then((work) => {
     parentPort.postMessage(work)
   })
