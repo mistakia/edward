@@ -92,7 +92,7 @@ const run = async () => {
       await processBlock(blockHash)
     }
 
-    precompute.check(accountState.frontier)
+    precompute.check([address])
   }
 }
 
