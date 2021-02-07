@@ -25,7 +25,8 @@ class Edward {
   }
 
   _hasFunds ({ accountInfo, amount }) {
-    const balance = new BigNumber(accountInfo.balance_decimal)
+    const balanceNano = tools.convert(accountInfo.balance, 'RAW', 'NANO')
+    const balance = new BigNumber(balanceNano)
     log(`checking if ${balance} is greater than ${amount}`)
     return balance.isGreaterThanOrEqualTo(amount)
   }
