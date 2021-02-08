@@ -9,6 +9,13 @@ const { parseMessage, sendDirectMessage, sendGroupMessage } = require('./utils')
 
 const log = debug('groupme')
 const edward = new Edward(config.seed)
+connected = false
+
+const reconnect = () => {
+  if (connected) return
+  incoming.connect()
+  setTimeout(() => reconnect(), 30000)
+}
 
 const incoming = new GroupMe.IncomingStream(
   config.groupme.ACCESS_TOKEN,
@@ -19,6 +26,7 @@ const incoming = new GroupMe.IncomingStream(
 // This waits for the IncomingStream to complete its handshake and start listening.
 // We then get the bot id of a specific bot.
 incoming.on('connected', () => {
+  connected = true
   log('connected')
 })
 
@@ -160,14 +168,14 @@ incoming.on('message', async (msg) => {
 
 // This listens for the bot to disconnect
 incoming.on('disconnected', () => {
+  connected = false
   log('disconnected')
-  // TODO - reconnect
+  reconnect()
 })
 
 // This listens for an error to occur on the Websockets IncomingStream.
 incoming.on('error', (message, payload) => {
   log('error', message, payload)
-  // TODO - reconnect
 })
 
 module.exports = incoming
