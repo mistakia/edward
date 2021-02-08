@@ -9,7 +9,7 @@ const { parseMessage, sendDirectMessage, sendGroupMessage } = require('./utils')
 
 const log = debug('groupme')
 const edward = new Edward(config.seed)
-connected = false
+let connected = false
 
 const reconnect = () => {
   if (connected) return
