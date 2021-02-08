@@ -4,6 +4,7 @@ const nanocurrency = require('nanocurrency')
 
 const log = debug('nano:compute-work')
 
+const rpc = require('./rpc')
 const db = require('../../db')
 
 const createWorker = (hash, difficulty) => {
@@ -29,7 +30,13 @@ if (isMainThread) {
       return rows[0].work
     }
 
-    return createWorker(hash, difficulty)
+    const res = await rpc('work_generate', {
+      difficulty
+    })
+
+    return res.work
+
+    //return createWorker(hash, difficulty)
   }
 } else {
   log(`computing work against ${workerData.hash} at ${workerData.difficulty} difficulty`)
