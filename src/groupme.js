@@ -127,7 +127,7 @@ incoming.on('message', async (msg) => {
         senderId: msg.data.subject.user_id,
         senderName: msg.data.subject.name,
         type: constants.GROUPME,
-        amount: parsed.params.amount,
+        amountRaw: parsed.params.amount,
         receiverIds
       })
       break
@@ -157,7 +157,7 @@ incoming.on('message', async (msg) => {
         senderId: msg.data.subject.user_id,
         senderName: msg.data.subject.name,
         type: constants.GROUPME,
-        amount: parsed.params.amount,
+        amountRaw: parsed.params.amount,
         receiverIds
       })
       break

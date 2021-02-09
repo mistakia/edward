@@ -1,4 +1,4 @@
-const { block, wallet, tools } = require('nanocurrency-web')
+const { block, wallet } = require('nanocurrency-web')
 const BigNumber = require('bignumber.js')
 const debug = require('debug')
 
@@ -25,11 +25,10 @@ class Edward {
     this.accounts = new Accounts(seed)
   }
 
-  _hasFunds ({ accountInfo, amount }) {
-    const balanceNano = tools.convert(accountInfo.balance, 'RAW', 'NANO')
-    const balance = new BigNumber(balanceNano)
-    log(`checking if ${balance} is greater than ${amount}`)
-    return balance.isGreaterThanOrEqualTo(amount)
+  _hasFunds ({ accountInfo, amountRaw }) {
+    const balance = new BigNumber(accountInfo.balance)
+    log(`checking if ${balance} is greater than ${amountRaw}`)
+    return balance.isGreaterThanOrEqualTo(amountRaw)
   }
 
   _getWallet (uid) {
@@ -38,13 +37,13 @@ class Edward {
   }
 
   async _send ({
-    senderId, type, amount, receiverId, accountInfo, transactionType, senderName
+    senderId, type, amountRaw, receiverId, accountInfo, transactionType, senderName
   }) {
     if (receiverId === config.groupme.USER_ID) {
       // TODO send notification
       return
     }
-    log(`sending ${amount} from ${senderId} to ${receiverId}`)
+    log(`sending ${amountRaw} RAW from ${senderId} to ${receiverId}`)
     const senderAccount = await this.accounts.findOrCreate({ userId: senderId, type })
     const receiverAccount = await this.accounts.findOrCreate({ userId: receiverId, type })
     const { data, hash } = await createSendBlock({
@@ -53,7 +52,7 @@ class Edward {
       toAddress: receiverAccount.address || receiverAccount.custody,
       representativeAddress: accountInfo.representative,
       frontier: accountInfo.frontier,
-      amountRaw: tools.convert(amount, 'NANO', 'RAW')
+      amountRaw: amountRaw.toFixed(0)
     })
     const accountWallet = this._getWallet(senderAccount.uid)
     const signedBlock = block.send(data, accountWallet.privateKey)
@@ -84,7 +83,7 @@ class Edward {
       type: transactionType
     })
 
-    const messages = [`Received ${amount.toFixed()} NANO tip from ${senderName}.`]
+    const messages = [`Received ${amountRaw.toFixed()} RAW tip from ${senderName}.`]
     if (!receiverAccount.address) {
       messages.push('Register a wallet address to receive tips directly in the future. Type "/edward help" for more info')
       messages.push('A good beginner wallet is https://natrium.io/. Visit https://nanowallets.guide/ for a comprehensive list of wallets.')
@@ -96,6 +95,7 @@ class Edward {
     if (!userId || !type || !address) return
     log(`register ${address} for ${userId}:${type}`)
     const accountEntry = await this.accounts.register({ userId, type, address })
+    // TODO - like command message
     await sendDirectMessage({
       userId,
       type,
@@ -111,20 +111,20 @@ class Edward {
     return accountEntry
   }
 
-  async tip ({ senderId, type, receiverIds, amount, senderName, groupId }) {
-    if (!senderId || !type || !amount) return
+  async tip ({ senderId, type, receiverIds, amountRaw, senderName, groupId }) {
+    if (!senderId || !type || !amountRaw) return
     if (!receiverIds || !receiverIds.length) return
 
-    log(`tip from ${senderId} to ${receiverIds} for ${amount}`)
+    log(`tip from ${senderId} to ${receiverIds} for ${amountRaw}`)
     const account = await this.accounts.findOrCreate({ userId: senderId, type })
-    const total = amount.multipliedBy(receiverIds.length)
+    const totalRaw = amountRaw.multipliedBy(receiverIds.length)
     const accountInfo = await rpc('account_info', {
       account: account.custody,
       representative: true
     })
     log('sender account info', accountInfo)
 
-    const hasFunds = !accountInfo.error && this._hasFunds({ accountInfo, amount: total })
+    const hasFunds = !accountInfo.error && this._hasFunds({ accountInfo, amountRaw: totalRaw })
     if (!hasFunds) {
       log(`${senderId} has insufficient funds`)
       await sendGroupMessage({
@@ -139,7 +139,7 @@ class Edward {
       await this._send({
         senderId,
         type,
-        amount,
+        amountRaw: amountRaw,
         receiverId,
         accountInfo,
         senderName,
@@ -147,6 +147,7 @@ class Edward {
       })
     }
 
+    // TODO - like command message
     await sendGroupImage({
       type,
       groupId,
@@ -154,11 +155,11 @@ class Edward {
     })
   }
 
-  async rain ({ senderId, type, receiverIds, amount, senderName, groupId }) {
-    if (!senderId || !type || !amount) return
+  async rain ({ senderId, type, receiverIds, amountRaw, senderName, groupId }) {
+    if (!senderId || !type || !amountRaw) return
     if (!receiverIds || !receiverIds.length) return
 
-    log(`rain from ${senderId} to ${receiverIds} for ${amount}`)
+    log(`rain from ${senderId} to ${receiverIds} for ${amountRaw}`)
     const account = await this.accounts.findOrCreate({ userId: senderId, type })
     const accountInfo = await rpc('account_info', {
       account: account.custody,
@@ -166,7 +167,7 @@ class Edward {
     })
     log('sender account info', accountInfo)
 
-    const hasFunds = !accountInfo.error && this._hasFunds({ accountInfo, amount })
+    const hasFunds = !accountInfo.error && this._hasFunds({ accountInfo, amountRaw })
     if (!hasFunds) {
       log(`${senderId} has insufficient funds`)
       await sendGroupMessage({
@@ -177,12 +178,12 @@ class Edward {
       return
     }
 
-    const each = amount.dividedBy(receiverIds.length)
+    const eachRaw = amountRaw.dividedBy(receiverIds.length)
     for (const receiverId of receiverIds) {
       await this._send({
         senderId,
         type,
-        amount: each,
+        amountRaw: eachRaw,
         receiverId,
         accountInfo,
         senderName,
@@ -190,6 +191,7 @@ class Edward {
       })
     }
 
+    // TODO - like command message
     await sendGroupImage({
       type,
       groupId,
@@ -204,12 +206,13 @@ class Edward {
     })
 
     const balanceRaw = !accountInfo.error ? accountInfo.balance : '0'
-    const balanceNano = tools.convert(balanceRaw, 'RAW', 'NANO')
-    const balance = new BigNumber(balanceNano)
+    const balance = new BigNumber(balanceRaw)
+
+    // TODO - like command message
     await sendDirectMessage({
       userId,
       type,
-      messages: [`Tip balance of ${balance.toFixed()} NANO`]
+      messages: [`Tip balance of ${balance.toFixed()} RAW`]
     })
   }
 
@@ -222,7 +225,7 @@ class Edward {
   async help ({ groupId, userId, type }) {
     if (!groupId && !userId) return
     log(`sending help message to ${groupId || userId}`)
-    const messages = ['Commands start with /edward.\n/edward help\n/edward register [nano_address]\n/edward tip [amount] @user\n/edward rain [amount]\n/edward balance']
+    const messages = ['Commands start with /edward.\n/edward help\n/edward register [nano_address]\n/edward tip [amount] @user\n/edward balance']
 
     if (groupId) {
       messages.push('Please ask edward for help via direct messages')
