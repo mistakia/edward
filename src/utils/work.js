@@ -5,6 +5,7 @@ const { Worker } = require('worker_threads')
 
 const queue = new PQueue({ concurrency: 1 })
 const log = debug('nano:work')
+const wait = ms => new Promise(resolve => setTimeout(resolve, ms))
 
 const rpc = require('./rpc')
 const db = require('../../db')
@@ -60,26 +61,23 @@ const add = async (addresses) => {
 
 const compute = async (hash, difficulty) => {
   log(`queueing work for ${hash}`)
-  let work
-  await queue.add(async () => {
+  return queue.add(async () => {
     if (process.env.NODE_ENV !== 'production') {
-      work = 'x'
-      return
+      await wait(1500)
+      return 'x'
     }
 
     const rows = await db('work').where({ hash })
     if (rows.length) {
       log(`found precomputed work (${rows[0].work}) against ${hash}`)
-      work = rows[0].work
-      return
+      return rows[0].work
     }
 
-    work = await createWorker(hash, difficulty)
+    const work = await createWorker(hash, difficulty)
     log(`saving precomputed work ${work} for ${hash}`)
     await db('work').insert({ hash, work }).onConflict().ignore()
+    return work
   })
-
-  return work
 }
 
 module.exports = {
