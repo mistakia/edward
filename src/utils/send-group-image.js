@@ -14,7 +14,7 @@ const sendGroupImage = async ({ groupId, type, image }) => {
   log(`sending image ${image} to ${groupId}`)
   try {
     await API.Messages.create.Q(config.groupme.ACCESS_TOKEN, groupId, {
-      message: { attachments: { type: 'image', url: image } }
+      message: { attachments: [{ type: 'image', url: image }] }
     })
   } catch (err) {
     log(err)
