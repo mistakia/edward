@@ -11,5 +11,5 @@ module.exports = {
   sendDirectMessage: require('./send-direct-message'),
   sendGroupMessage: require('./send-group-message'),
   sendGroupImage: require('./send-group-image'),
-  computeWork: require('./compute-work')
+  work: require('./work')
 }

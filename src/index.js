@@ -8,9 +8,9 @@ const {
   sendDirectMessage,
   sendGroupMessage,
   sendGroupImage,
-  randomGif
+  randomGif,
+  work
 } = require('./utils')
-const precompute = require('./precompute')
 const Accounts = require('./accounts')
 const db = require('../db')
 const constants = require('../constants')
@@ -72,7 +72,7 @@ class Edward {
         return
       }
 
-      precompute.check([senderAccount.custody])
+      work.add([senderAccount.custody])
     }
 
     await db('transactions').insert({

@@ -1,6 +1,6 @@
 const { wallet } = require('nanocurrency-web')
 
-const precompute = require('./precompute')
+const { work } = require('./utils')
 const db = require('../db')
 
 class Accounts {
@@ -21,7 +21,7 @@ class Accounts {
         custody: account.address,
         publicKey: account.publicKey
       }).where({ uid })
-      precompute.check([account.address])
+      work.add([account.address])
     } else if (address && address !== entry.address) {
       await db('accounts').update({ address }).where({ userId, type })
     }
@@ -39,7 +39,7 @@ class Accounts {
       custody: account.address,
       publicKey: account.publicKey
     }).where({ uid })
-    precompute.check([account.address])
+    work.add([account.address])
     return this.get({ userId, type })
   }
 

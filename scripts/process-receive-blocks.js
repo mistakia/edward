@@ -7,8 +7,7 @@ const db = require('../db')
 const config = require('../config')
 const constants = require('../constants')
 const Edward = require('../src/index')
-const precompute = require('../src/precompute')
-const { rpc, createReceiveBlock, sendDirectMessage } = require('../src/utils')
+const { rpc, createReceiveBlock, sendDirectMessage, work } = require('../src/utils')
 
 const run = async () => {
   const edward = new Edward(config.seed)
@@ -93,7 +92,7 @@ const run = async () => {
       await processBlock(blockHash)
     }
 
-    precompute.check([address])
+    work.add([address])
   }
 }
 

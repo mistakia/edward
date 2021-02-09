@@ -1,7 +1,7 @@
 const debug = require('debug')
 
 const server = require('../src/server')
-const precompute = require('../src/precompute')
+const { work } = require('../src/utils')
 const processReceiveBlocks = require('../scripts/process-receive-blocks')
 
 const log = debug('nano:pending-blocks')
@@ -23,5 +23,5 @@ const port = process.env.PORT || 8000
 server.listen(port, () => server.locals.log(`API listening on port ${port}`))
 server.locals.groupme.connect()
 
-precompute.init()
+work.init()
 processReceiveBlocksWorker()
