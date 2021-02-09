@@ -7,8 +7,8 @@ module.exports = {
   COMMANDS: ['tip', 'register', 'rain', 'stats', 'balance', 'help'],
 
   MISSING_KEYWORD: 'Message missing keyword',
-  MISSING_COMMAND: 'Missing command, enter "/wisdom help" for more info',
-  INVALID_COMMAND: 'Invalid command, enter "/wisdom help" for more info',
+  MISSING_COMMAND: 'Missing command, enter "/edward help" for more info',
+  INVALID_COMMAND: 'Invalid command, enter "/edward help" for more info',
 
   MISSING_AMOUNT: 'Missing amount - /edward tip [amount]',
   INVALID_AMOUNT: 'Invalid amount - should be a whole number or a decimal',

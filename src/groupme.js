@@ -61,6 +61,23 @@ incoming.on('message', async (msg) => {
         })
         break
 
+      case constants.MISSING_COMMAND: {
+        if (msg.data.subject.group_id) {
+          await sendGroupMessage({
+            type: constants.GROUPME,
+            messages: [parsed.message],
+            groupId: msg.data.subject.group_id
+          })
+        } else if (msg.data.subject.user_id) {
+          await sendDirectMessage({
+            type: constants.GROUPME,
+            messages: [parsed.message],
+            userId: msg.data.subject.user_id
+          })
+        }
+        break
+      }
+
       case constants.MISSING_AMOUNT:
       case constants.INVALID_AMOUNT: {
         const groupId = msg.data.subject.group_id
