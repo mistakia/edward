@@ -1,4 +1,4 @@
-const { block, tools } = require('nanocurrency-web')
+const { block } = require('nanocurrency-web')
 const debug = require('debug')
 const log = debug('nano:pending-blocks')
 const BigNumber = require('bignumber.js')
@@ -78,11 +78,11 @@ const run = async () => {
           // update account balance
           accountState.balanceRaw = signedBlock.balance
 
-          const amountNano = new BigNumber(tools.convert(blockInfo.amount, 'RAW', 'NANO'))
+          const amountRaw = new BigNumber(blockInfo.amount)
           await sendDirectMessage({
             userId: accountEntry.userId,
             type: accountEntry.type,
-            messages: [`Received ${amountNano.toFixed()} to tip address`]
+            messages: [`Received ${amountRaw.toFixed()} RAW to tip address`]
           })
         }
       }
