@@ -87,6 +87,7 @@ class Edward {
     const messages = [`Received ${amount.toFixed()} NANO tip from ${senderName}.`]
     if (!receiverAccount.address) {
       messages.push('Register a wallet address to receive tips directly in the future. Type "/edward help" for more info')
+      messages.push('A good beginner wallet is https://natrium.io/. Visit https://nanowallets.guide/ for a comprehensive list of wallets.')
     }
     await sendDirectMessage({ userId: receiverId, type, messages })
   }
@@ -145,6 +146,12 @@ class Edward {
         transactionType: constants.TRANSACTIONS.TIP
       })
     }
+
+    await sendGroupImage({
+      type,
+      groupId,
+      image: randomGif()
+    })
   }
 
   async rain ({ senderId, type, receiverIds, amount, senderName, groupId }) {
