@@ -89,6 +89,8 @@ class Edward {
       messages.push('A good beginner wallet is https://natrium.io/. Visit https://nanowallets.guide/ for a comprehensive list of wallets.')
     }
     await sendDirectMessage({ userId: receiverId, type, messages })
+
+    return res.hash
   }
 
   async register ({ userId, type, address }) {
@@ -135,8 +137,9 @@ class Edward {
       return
     }
 
+    let hash
     for (const receiverId of receiverIds) {
-      await this._send({
+      hash = await this._send({
         senderId,
         type,
         amountRaw: amountRaw,
@@ -151,6 +154,7 @@ class Edward {
     await sendGroupImage({
       type,
       groupId,
+      text: `https://nanolooker.com/block/${hash}`,
       image: randomGif()
     })
   }
@@ -178,9 +182,10 @@ class Edward {
       return
     }
 
+    let hash
     const eachRaw = amountRaw.dividedBy(receiverIds.length)
     for (const receiverId of receiverIds) {
-      await this._send({
+      hash = await this._send({
         senderId,
         type,
         amountRaw: eachRaw,
@@ -195,6 +200,7 @@ class Edward {
     await sendGroupImage({
       type,
       groupId,
+      text: `https://nanolooker.com/block/${hash}`,
       image: randomGif()
     })
   }
