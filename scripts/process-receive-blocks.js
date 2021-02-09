@@ -51,7 +51,7 @@ const run = async () => {
       const blockInfo = res.blocks[address][blockHash]
 
       const { balanceRaw, representativeAddress, frontier } = accountState
-      const { data } = await createReceiveBlock({
+      const data = await createReceiveBlock({
         balanceRaw,
         representativeAddress,
         frontier,

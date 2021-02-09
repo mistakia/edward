@@ -33,7 +33,7 @@ describe('edward.rain', function () {
           receiverId2,
           receiverId3
         ],
-        amount: new BigNumber('0.000001')
+        amountRaw: new BigNumber('0.000001')
       })
     } catch (err) {
       error = err

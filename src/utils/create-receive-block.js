@@ -1,5 +1,4 @@
 const debug = require('debug')
-const nanocurrency = require('nanocurrency')
 
 const log = debug('nano:receive-block')
 const constants = require('../../constants')
@@ -15,28 +14,18 @@ const createReceiveBlock = async ({
   frontier,
   amountRaw
 }) => {
-  const hash = nanocurrency.hashBlock({
-    account: toAddress,
-    balance: balanceRaw,
-    link: transactionHash,
-    previous: frontier,
-    representative: representativeAddress
-  })
   const workHash = isOpen ? publicKey : frontier
-  log(`generating work against ${workHash} for receive block ${hash}`)
+  log(`generating work against ${workHash} for receive block`)
   const work = await pow.compute(workHash, constants.RECEIVE_DIFFICULTY)
 
   return {
-    hash,
-    data: {
-      walletBalanceRaw: balanceRaw,
-      toAddress,
-      representativeAddress,
-      transactionHash,
-      frontier,
-      amountRaw,
-      work
-    }
+    walletBalanceRaw: balanceRaw,
+    toAddress,
+    representativeAddress,
+    transactionHash,
+    frontier,
+    amountRaw,
+    work
   }
 }
 

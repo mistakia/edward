@@ -27,7 +27,7 @@ describe('edward.tip', function () {
         senderId,
         type: constants.GROUPME,
         receiverIds: [receiverId],
-        amount: new BigNumber('0.000001')
+        amountRaw: new BigNumber('0.000001')
       })
     } catch (err) {
       error = err

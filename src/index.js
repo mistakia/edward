@@ -46,7 +46,7 @@ class Edward {
     log(`sending ${amountRaw} RAW from ${senderId} to ${receiverId}`)
     const senderAccount = await this.accounts.findOrCreate({ userId: senderId, type })
     const receiverAccount = await this.accounts.findOrCreate({ userId: receiverId, type })
-    const { data, hash } = await createSendBlock({
+    const data = await createSendBlock({
       balanceRaw: accountInfo.balance,
       fromAddress: senderAccount.custody,
       toAddress: receiverAccount.address || receiverAccount.custody,
@@ -57,33 +57,33 @@ class Edward {
     const accountWallet = this._getWallet(senderAccount.uid)
     const signedBlock = block.send(data, accountWallet.privateKey)
 
-    if (process.env.NODE_ENV === 'production') {
-      log(`broadcasting send block: ${hash}`)
-      const res = await rpc('process', {
-        json_block: true,
-        subtype: 'send',
-        block: signedBlock
-      })
-      log('node response', res)
+    if (process.env.NODE_ENV !== 'production') return
 
-      if (res.error) {
-        // TODO send notification
-        return
-      }
+    log(`broadcasting send block: ${signedBlock}`)
+    const res = await rpc('process', {
+      json_block: true,
+      subtype: 'send',
+      block: signedBlock
+    })
+    log('node response', res)
 
-      work.add([senderAccount.custody])
+    if (res.error) {
+      // TODO send notification
+      return
     }
+
+    work.add([senderAccount.custody])
 
     await db('transactions').insert({
       uid: senderAccount.uid,
-      hash,
+      hash: res.hash,
       address: data.toAddress,
       amount: data.amountRaw,
       timestamp: Math.round(Date.now() / 1000),
       type: transactionType
     })
 
-    const messages = [`Received ${amountRaw.toFixed()} RAW tip from ${senderName}.`]
+    const messages = [`Received ${amountRaw.toFixed()} RAW tip from ${senderName}. https://nanolooker.com/block/${res.hash}`]
     if (!receiverAccount.address) {
       messages.push('Register a wallet address to receive tips directly in the future. Type "/edward help" for more info')
       messages.push('A good beginner wallet is https://natrium.io/. Visit https://nanowallets.guide/ for a comprehensive list of wallets.')
@@ -100,8 +100,8 @@ class Edward {
       userId,
       type,
       messages: [
-        `Successfully registered receive address: ${address}.`,
-        `Your tip account address is ${accountEntry.custody}.`,
+        `Successfully registered receive address: https://nanolooker.com/account/${address}`,
+        `Your tip account address: https://nanolooker.com/account/${accountEntry.custody}`,
         'Tips will be sent from your tip account address, ' +
           'while tips received will go directly to your registered receive address.' +
           'To send tips deposit nano to your tip account address.'
