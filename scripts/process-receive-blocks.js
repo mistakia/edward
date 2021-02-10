@@ -14,8 +14,6 @@ const run = async () => {
 
   const accounts = await db('accounts')
 
-  log(`checking pending blocks for ${accounts.length} accounts`)
-
   const addresses = accounts.map(p => p.custody)
   const res = await rpc('accounts_pending', {
     accounts: addresses,

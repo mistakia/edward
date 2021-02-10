@@ -13,6 +13,7 @@ let connected = false
 
 const reconnect = () => {
   if (connected) return
+  log('reconnecting')
   incoming.connect()
   setTimeout(() => reconnect(), 30000)
 }
