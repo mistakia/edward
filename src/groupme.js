@@ -188,7 +188,7 @@ incoming.on('message', async (msg) => {
 incoming.on('disconnected', () => {
   connected = false
   log('disconnected')
-  reconnect()
+  // reconnect()
 })
 
 // This listens for an error to occur on the Websockets IncomingStream.
