@@ -10,7 +10,7 @@ const invalid = (message) => ({
 })
 
 const parseMessage = (message) => {
-  if (message.substring(0, 7) !== '/edward') {
+  if (message.substring(0, 7).toLowerCase() !== '/edward') {
     return invalid(constants.MISSING_KEYWORD)
   }
 
