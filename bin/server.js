@@ -23,5 +23,10 @@ const port = process.env.PORT || 8000
 server.listen(port, () => server.locals.log(`API listening on port ${port}`))
 server.locals.groupme.connect()
 
+setInterval(() => {
+  server.locals.groupme.disconnect()
+  server.locals.groupme.connect()
+}, 300000) // 5 mins
+
 work.init()
 processReceiveBlocksWorker()

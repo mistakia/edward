@@ -34,14 +34,14 @@ incoming.on('connected', () => {
 // This waits for messages coming in from the IncomingStream
 // If the message contains @BOT, we parrot the message back.
 incoming.on('message', async (msg) => {
+  log(msg)
+
   const validTypes = ['line.create', 'direct_message.create']
   if (!msg.data || !validTypes.includes(msg.data.type)) return
 
   if (!msg.data.subject.text) {
     return
   }
-
-  log(msg)
 
   /* if (message.group_id !== config.groupme.GROUP_ID) {
    *   return
